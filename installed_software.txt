@@ -1,0 +1,4 @@
+sratoolkit
+cellranger
+sshfs
+pigz
