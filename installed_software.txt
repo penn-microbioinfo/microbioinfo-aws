@@ -2,3 +2,9 @@ sratoolkit
 cellranger
 sshfs
 pigz
+hdf5-tools
+btop
+
+conda
+------
+kallisto
