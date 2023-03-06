@@ -1,10 +1,17 @@
+function try_require(module_name) 
+    local ok, module = pcall(require, module_name);
+    if ok then
+        return module
+    else
+    end
+
 -- Packer plugins
 require('plugins').install()
 
-require('lualine').setup {
+try_require('lualine').setup {
     options = { theme = require'lualine.themes.horizon' },
 }
-require'nvim-treesitter.configs'.setup {
+try_require'nvim-treesitter.configs'.setup {
   -- A list of parser names, or "all" (the four listed parsers should always be installed)
   ensure_installed = { "bash", "c", "lua", "vim", "help", "python", "r", "rust" },
 
