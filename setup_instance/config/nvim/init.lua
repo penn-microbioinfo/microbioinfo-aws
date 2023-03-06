@@ -8,7 +8,7 @@ end
 -- Packer plugins
 require('plugins').install()
 
-try_require('lualine').setup {
+try_require'lualine'.setup {
     options = { theme = require'lualine.themes.horizon' },
 }
 try_require'nvim-treesitter.configs'.setup {
