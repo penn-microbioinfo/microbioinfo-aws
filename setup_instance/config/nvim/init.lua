@@ -1,16 +1,3 @@
--- Nvim settings
-vim.o.number = true
-vim.o.softtabstop = 4
-vim.o.expandtab = true
-vim.o.shiftwidth = 4
-vim.o.smartindent = true
-vim.cmd.colorscheme('zephyr')
-
--- Nvim-R settings
-vim.api.nvim_set_var('R_assign', 0)
-vim.api.nvim_set_var('maplocalleader', "'")
-vim.api.nvim_set_var('R_external_term', 'urxvt')
-
 -- Packer plugins
 require('plugins')
 require('lualine').setup {
@@ -57,3 +44,17 @@ require'nvim-treesitter.configs'.setup {
     additional_vim_regex_highlighting = false,
   },
 }
+
+-- Nvim settings
+vim.o.number = true
+vim.o.softtabstop = 4
+vim.o.expandtab = true
+vim.o.shiftwidth = 4
+vim.o.smartindent = true
+vim.cmd.colorscheme('zephyr')
+
+-- Nvim-R settings
+vim.api.nvim_set_var('R_assign', 0)
+vim.api.nvim_set_var('maplocalleader', "'")
+vim.api.nvim_set_var('R_external_term', 'urxvt')
+
