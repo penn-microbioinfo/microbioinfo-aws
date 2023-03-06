@@ -8,7 +8,7 @@ sudo apt update
 sudo apt install -y r-base-core libhdf5-dev tmux libfontconfig1-dev libharfbuzz-dev libfribidi-dev libfreetype6-dev libpng-dev libtiff5-dev libjpeg-dev libxml2-dev zsh sysstat
 
 #Change shell to zsh
-sudo chsh ubuntu /usr/bin/zsh
+sudo chsh -s /usr/bin/zsh ubuntu
 rm $HOME/.zshrc
 ln -s $HOME/microbioinfo-aws/setup_instance/config/zshrc $HOME/.zshrc
 
