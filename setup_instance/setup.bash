@@ -24,7 +24,6 @@ git clone --depth 1 https://github.com/wbthomason/packer.nvim $HOME/.local/share
 git clone https://github.com/penn-microbioinfo/microbioinfo-aws.git $HOME/.
 mkdir -p $HOME/.config
 ln -s $HOME/microbioinfo-aws/setup_instance/config/nvim $HOME/.config/.
-vim "+PackerInstall" "+q" tmp
 
 # Create the expected R_USER_LIBS directory so that 
 r_user_libs_path=$(cat /etc/R/Renviron | grep R_LIBS_USER | grep -v '^#' | grep -Eo "['][^']+[']" | sed "s/'//g")
@@ -33,4 +32,4 @@ mkdir -p $(echo $r_user_libs_path | sed 's#~#'$HOME'#')
 # Install Seurat, tidyverse, and other R dependencies
 Rscript install_R_deps.R
 
-echo "Shell has been changes to zsh and config copied to ~/.zshrc - restart session for changes to take effect."
+echo "Shell has been changed to zsh and config copied to ~/.zshrc - restart session for changes to take effect."
