@@ -1,5 +1,6 @@
 -- Packer plugins
-require('plugins')
+require('plugins').install()
+
 require('lualine').setup {
     options = { theme = require'lualine.themes.horizon' },
 }
