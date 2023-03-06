@@ -4,7 +4,7 @@ function try_require(module_name)
         return module
     else
     end
-
+end
 -- Packer plugins
 require('plugins').install()
 
