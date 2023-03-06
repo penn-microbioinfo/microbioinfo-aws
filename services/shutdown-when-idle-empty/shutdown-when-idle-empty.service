@@ -1,0 +1,12 @@
+[Unit]
+Description=Shutdown this machine if there is low CPU usage over a period of time AND no one is logged in.
+
+[Service]
+Type=simple
+ExecStart=python /opt/shutdown-when-idle-empty/monitor_usage_and_activity.py
+Restart=on-failure
+RuntimeDirectory=shutdown-when-idle-empty
+RuntimeDirectoryMode=0755
+
+[Install]
+WantedBy=multi-user.target
