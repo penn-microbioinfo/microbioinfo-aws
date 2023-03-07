@@ -1,4 +1,5 @@
-function nullmodule:setup(...) {}
+function nullmodule:setup(...)
+end
 
 function try_require(module_name) 
     local ok, module = pcall(require, module_name);
