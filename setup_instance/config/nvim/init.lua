@@ -72,5 +72,4 @@ local ok, _ = pcall(vim.cmd.colorscheme, 'zephyr')
 -- Nvim-R settings
 vim.api.nvim_set_var('R_assign', 0)
 vim.api.nvim_set_var('maplocalleader', "'")
-vim.api.nvim_set_var('R_external_term', 'urxvt')
 
