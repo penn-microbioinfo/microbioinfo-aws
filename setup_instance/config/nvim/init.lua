@@ -15,7 +15,7 @@ end
 require('plugins').install()
 
 try_require'lualine'.setup {
-    options = { theme = require'lualine.themes.horizon' },
+    options = { theme = try_require'lualine.themes.horizon' },
 }
 try_require'nvim-treesitter.configs'.setup {
   -- A list of parser names, or "all" (the four listed parsers should always be installed)
