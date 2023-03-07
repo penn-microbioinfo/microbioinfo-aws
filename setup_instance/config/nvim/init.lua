@@ -1,14 +1,17 @@
+function nullmodule:setup(...) {}
+
 function try_require(module_name) 
     local ok, module = pcall(require, module_name);
     if ok then
         return module
-    else
+    else    
+        return nullmodule 
     end
 end
 -- Packer plugins
 require('plugins').install()
 
-require'lualine'.setup {
+try_require'lualine'.setup {
     options = { theme = require'lualine.themes.horizon' },
 }
 require'nvim-treesitter.configs'.setup {
