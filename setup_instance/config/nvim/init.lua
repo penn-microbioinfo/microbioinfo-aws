@@ -1,5 +1,6 @@
-nullmodule {x=0}
+nullmodule {}
 function nullmodule:setup(...)
+    return {}
 end
 
 function try_require(module_name) 
