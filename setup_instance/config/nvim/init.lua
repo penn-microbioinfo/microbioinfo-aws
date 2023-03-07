@@ -17,7 +17,7 @@ require('plugins').install()
 try_require'lualine'.setup {
     options = { theme = require'lualine.themes.horizon' },
 }
-require'nvim-treesitter.configs'.setup {
+try_require'nvim-treesitter.configs'.setup {
   -- A list of parser names, or "all" (the four listed parsers should always be installed)
   ensure_installed = { "bash", "c", "lua", "vim", "help", "python", "r", "rust" },
 
