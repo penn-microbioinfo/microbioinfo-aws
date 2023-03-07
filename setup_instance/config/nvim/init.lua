@@ -1,4 +1,4 @@
-nullmodule {}
+nullmodule = {}
 function nullmodule:setup(...)
     return {}
 end
