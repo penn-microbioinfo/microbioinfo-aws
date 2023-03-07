@@ -1,3 +1,4 @@
+nullmodule {}
 function nullmodule:setup(...)
 end
 
