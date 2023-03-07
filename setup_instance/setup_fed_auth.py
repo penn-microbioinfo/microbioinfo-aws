@@ -28,6 +28,6 @@ python3 setup.py develop
 
 cd ../
 
-echo "AWS_PROFILE=445654575720-BushmanLabPostdoc" >> $HOME/.zshrc
+echo "export AWS_PROFILE=445654575720-BushmanLabPostdoc" >> $HOME/.zshrc
 echo "alias awsenv='source $HOME/pyenvs/pennaws/bin/activate'" >> $HOME/.zshrc
 echo "alias awsauth='awsenv; python ${HOME}/lib/aws-federated-auth/aws-federated-auth.py'" >> $HOME/.zshrc
