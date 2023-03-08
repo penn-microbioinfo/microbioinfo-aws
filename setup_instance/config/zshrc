@@ -30,11 +30,5 @@ alias ls="ls --color=auto"
 alias history="history -100000000000"
 alias lsblk="lsblk -o NAME,PARTUUID,SIZE,TYPE,MOUNTPOINTS"
 
-pgrep -u "$USER" ssh-agent > /dev/null
-if [[ ! $? == 0 ]]; then
-	ssh-agent -t 12h > "$XDG_RUNTIME_DIR/ssh-agent.env"
-fi
-if [[ ! -f "$SSH_AUTH_SOCK" ]]; then
-	source "$XDG_RUNTIME_DIR/ssh-agent.env" >/dev/null
-fi
-
+alias awsenv='source /home/ubuntu/pyenvs/pennaws/bin/activate'
+alias awsauth='awsenv; python /home/ubuntu/lib/aws-federated-auth/aws-federated-auth.py; export AWS_PROFILE=445654575720-BushmanLabPostdoc'

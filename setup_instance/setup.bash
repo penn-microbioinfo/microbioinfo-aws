@@ -1,5 +1,7 @@
 #!/bin/bash
 
+. SETUP_VARS.bash
+
 mkdir -p $HOME/mnt/general
 mkdir -p $HOME/pkgs
 
@@ -30,6 +32,7 @@ r_user_libs_path=$(cat /etc/R/Renviron | grep R_LIBS_USER | grep -v '^#' | grep 
 mkdir -p $(echo $r_user_libs_path | sed 's#~#'$HOME'#')
 
 # Install Seurat, tidyverse, and other R dependencies
-Rscript install_R_deps.R
-
+if [ "$INSTALL_R_DEPS" == "yes" ]; then	
+    Rscript install_R_deps.R
+fi
 echo "Shell has been changed to zsh and config copied to ~/.zshrc - restart session for changes to take effect."
