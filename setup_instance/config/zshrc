@@ -29,6 +29,3 @@ PROMPT="%F{222}%n@%M%f %F{038}%3/%f %F{131}>>>%f "
 alias ls="ls --color=auto"
 alias history="history -100000000000"
 alias lsblk="lsblk -o NAME,PARTUUID,SIZE,TYPE,MOUNTPOINTS"
-
-alias awsenv='source /home/ubuntu/pyenvs/pennaws/bin/activate'
-alias awsauth='awsenv; python /home/ubuntu/lib/aws-federated-auth/aws-federated-auth.py; export AWS_PROFILE=445654575720-BushmanLabPostdoc'
