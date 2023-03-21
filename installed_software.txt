@@ -4,6 +4,7 @@ sshfs
 pigz
 hdf5-tools
 btop
+python-is-python3
 
 conda
 ------
