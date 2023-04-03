@@ -1,4 +1,4 @@
-cran_deps = c('tidyverse', 'Seurat', 'remotes', 'future', 'patchwork')
+cran_deps = c('tidyverse', 'Seurat', 'remotes', 'future', 'patchwork', 'argparse')
 
 for (d in cran_deps) {
     if (!requireNamespace(d, quietly=T)) {
