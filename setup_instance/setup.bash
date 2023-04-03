@@ -9,7 +9,7 @@ mkdir -p $HOME/pkgs
 sudo apt update
 sudo apt install -y r-base-core libhdf5-dev tmux libfontconfig1-dev libharfbuzz-dev \
 libfribidi-dev libfreetype6-dev libpng-dev libtiff5-dev libjpeg-dev libxml2-dev zsh sysstat \
-python3.10-venv
+python3.10-venv libcurl4-openssl-dev
 
 # synonymize python with python3
 sudo ln -fs /usr/bin/python3 /usr/bin/python
