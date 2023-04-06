@@ -20,10 +20,10 @@ rm $HOME/.zshrc
 ln -s $HOME/microbioinfo-aws/setup_instance/config/zshrc $HOME/.zshrc
 
 # Setup neovim
-wget https://github.com/neovim/neovim/releases/download/nightly/nvim-linux64.deb -P $HOME/pkgs/.
-sudo apt install $HOME/pkgs/nvim-linux64.deb
+wget https://github.com/neovim/neovim/releases/download/nightly/nvim.appimage -P $HOME/pkgs/.
+sudo mv $HOME/pkgs/nvim.appimage /usr/bin/nvim.appimage
 sudo rm /usr/bin/vim
-sudo ln -s /usr/bin/nvim /usr/bin/vim
+sudo ln -s /usr/bin/nvim.appimage /usr/bin/vim
 git clone --depth 1 https://github.com/wbthomason/packer.nvim $HOME/.local/share/nvim/site/pack/packer/start/packer.nvim
 git clone https://github.com/penn-microbioinfo/microbioinfo-aws.git $HOME/.
 mkdir -p $HOME/.config
