@@ -1,0 +1,3 @@
+[submodule "submodules/neovim-config"]
+	path = submodules/neovim-config
+	url = https://github.com/amsesk/neovim-config.git
