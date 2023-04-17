@@ -20,6 +20,7 @@ rm $HOME/.zshrc
 ln -s $HOME/microbioinfo-aws/setup_instance/config/zshrc $HOME/.zshrc
 
 # Setup neovim
+curl -sL install-node.vercel.app/lts | sudo bash # Install node.js for coc
 wget https://github.com/neovim/neovim/releases/download/nightly/nvim.appimage -P $HOME/pkgs/.
 chmod u+x $HOME/pkgs/nvim.appimage
 sudo mv $HOME/pkgs/nvim.appimage /usr/bin/nvim.appimage
