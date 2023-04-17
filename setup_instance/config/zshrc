@@ -24,8 +24,9 @@ export HISTSIZE=1000000000
 export SAVEHIST=1000000000
 
 # Prompt
-PROMPT="%F{222}%n@%M%f %F{038}%3/%f %F{131}>>>%f "
+PROMPT="%F{207}[local]%f %F{222}%n@%M%f %F{038}%3/%f %F{131}>>>%f "
 
 alias ls="ls --color=auto"
-alias history="history -100000000000"
+alias history="history 0"
 alias lsblk="lsblk -o NAME,PARTUUID,SIZE,TYPE,MOUNTPOINTS"
+alias vim=/usr/local/bin/nvim 
