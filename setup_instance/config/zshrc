@@ -1,0 +1,32 @@
+LS_COLORS='no=00;37:fi=00:di=00;33:ln=04;36:pi=40;33:so=01;35:bd=40;33;01:*.pdf=00;95'
+export LS_COLORS
+zstyle ':completion:*' list-colors ${(s.:.)LS_COLORS}
+
+# The following lines were added by compinstall
+zstyle ':completion:*' completer _complete _ignored
+zstyle ':completion:*' matcher-list '' 'l:|=* r:|=*' 'l:|=* r:|=*' 'l:|=* r:|=*' 'm:{a-z}={A-Za-z}'
+zstyle ':completion:*' menu select=1
+zstyle ':completion:*' select-prompt %SScrolling active: current selection at %p%s
+zstyle :compinstall filename '/home/amsesk/.zshrc'
+
+autoload -Uz compinit
+compinit
+# End of lines added by compinstall
+
+# History things
+setopt INC_APPEND_HISTORY
+setopt EXTENDED_HISTORY
+setopt SHARE_HISTORY
+export HISTFILE=~/.zhistory
+export HISTTIMEFORMAT="[%D]"
+export HISTFILESIZE=1000000000
+export HISTSIZE=1000000000
+export SAVEHIST=1000000000
+
+# Prompt
+PROMPT="%F{207}[local]%f %F{222}%n@%M%f %F{038}%3/%f %F{131}>>>%f "
+
+alias ls="ls --color=auto"
+alias history="history 0"
+alias lsblk="lsblk -o NAME,PARTUUID,SIZE,TYPE,MOUNTPOINTS"
+alias vim=/usr/local/bin/nvim 

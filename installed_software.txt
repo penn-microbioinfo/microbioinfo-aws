@@ -4,7 +4,11 @@ sshfs
 pigz
 fastqc
 miniconda3
-kallisto
 default-jre (ubuntu)
 multiqc
 firefox (for viewing graphics over ssh)
+hdf5-tools
+btop
+python-is-python3
+conda
+kallisto
