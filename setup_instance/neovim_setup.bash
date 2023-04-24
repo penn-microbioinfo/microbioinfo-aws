@@ -8,6 +8,6 @@ sudo mv $HOME/pkgs/nvim.appimage /usr/bin/nvim.appimage
 sudo rm /usr/bin/vim
 sudo ln -s /usr/bin/nvim.appimage /usr/bin/vim
 git clone --depth 1 https://github.com/wbthomason/packer.nvim $HOME/.local/share/nvim/site/pack/packer/start/packer.nvim
-git clone https://github.com/penn-microbioinfo/microbioinfo-aws.git $HOME/.
+git clone https://github.com/penn-microbioinfo/microbioinfo-aws.git $HOME/microbioinfo-aws
 mkdir -p $HOME/.config
 ln -s $HOME/microbioinfo-aws/setup_instance/config/nvim $HOME/.config/.
