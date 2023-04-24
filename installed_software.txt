@@ -2,3 +2,9 @@ sratoolkit
 cellranger
 sshfs
 pigz
+fastqc
+miniconda3
+kallisto
+default-jre (ubuntu)
+multiqc
+firefox (for viewing graphics over ssh)
