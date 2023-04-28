@@ -29,4 +29,6 @@ PROMPT="%F{207}[local]%f %F{222}%n@%M%f %F{038}%3/%f %F{131}>>>%f "
 alias ls="ls --color=auto"
 alias history="history 0"
 alias lsblk="lsblk -o NAME,PARTUUID,SIZE,TYPE,MOUNTPOINTS"
-alias vim=/usr/local/bin/nvim 
+alias awsenv='source /home/ubuntu/pyenvs/pennaws/bin/activate'
+alias awsauth='awsenv; python /home/ubuntu/lib/aws-federated-auth/aws-federated-auth.py; export AWS_PROFILE=445654575720-BushmanLabPostdoc'
+alias vim="nvim"

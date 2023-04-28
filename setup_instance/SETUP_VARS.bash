@@ -1,3 +1,2 @@
 export INSTALL_R_DEPS=no
-export INSTALL_AWS_FED_AUTH=yes
 export INSTALL_NEOVIM=yes
