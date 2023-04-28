@@ -11,11 +11,12 @@ import sys
 import hashlib
 import base64
 import time
+from multiprocessing import Pool
 
 PARTS_FNAME_PATTERN="^x[a-z]{2}$"
 
 class S3MultiPartUpload(object):
-    def __init__(self, bucket, key, abort_on_failure_to_complete = False):
+    def __init__(self, bucket, key, abort_on_failure_to_complete = False, nproc = 1):
         self.client = boto3.client("s3")
         self.bucket = bucket
         self.key = key
@@ -24,6 +25,7 @@ class S3MultiPartUpload(object):
         self.part_digests = None
         self.etag = None
         self.abort_on_failure_to_complete = abort_on_failure_to_complete
+        self.nproc = nproc
 
         self.upload_id = self._create_upload()
 
@@ -43,9 +45,10 @@ class S3MultiPartUpload(object):
         self.part_fnames = part_fnames
         logging.info(f"Part filenames (IN THIS ORDER): {self.part_fnames}")
         self.part_digests = S3MultiPartUpload._md5_digest_parts(self.part_fnames)
-        for i,f,d in zip(range(1, len(self.part_fnames)+1), self.part_fnames, S3MultiPartUpload._encode_b64(self.part_digests)
-):
-            self._upload_part(i,f,d)
+        parts = zip(range(1, len(self.part_fnames)+1), self.part_fnames, S3MultiPartUpload._encode_b64(self.part_digests)
+)
+        with Pool(self.nproc) as p:
+            p.map(self._upload_part, parts)
     
     def _generate_etag (self):
         if self.part_fnames is not None and self.part_digests is not None:
@@ -156,12 +159,13 @@ if __name__ == "__main__":
     parser.add_argument("-k", "--key", action = "store", help = "")
     parser.add_argument("-s", "--partsize", action = "store", help = "", default = 4950000000)
     parser.add_argument("-f", "--largefile", action = "store", help = "")
+    parser.add_argument("-p", "--nproc", action = "store", type = int, help = "")
     args = parser.parse_args()
 
     part_fnames = make_file_parts(args.largefile, part_size = args.partsize)
 
     # Begin interactions with S3
-    mpu = S3MultiPartUpload(args.bucket, args.key)
+    mpu = S3MultiPartUpload(args.bucket, args.key, nproc = args.npro)
     mpu.upload_parts(part_fnames)
     mpu.complete_upload()
 
