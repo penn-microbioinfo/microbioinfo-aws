@@ -11,17 +11,24 @@ import sys
 import hashlib
 import base64
 import time
-from multiprocessing import Pool
+from pathos.multiprocessing import ProcessPool
+from pathos.helpers import cpu_count
 
 PARTS_FNAME_PATTERN="^x[a-z]{2}$"
 
+def pooled(f, ):
+    f()
+    
+
 class S3MultiPartUpload(object):
     def __init__(self, bucket, key, abort_on_failure_to_complete = False, nproc = 1):
-        self.client = boto3.client("s3")
+        self.client = None 
         self.bucket = bucket
         self.key = key
         self.upload_id = None
         self.part_fnames = None
+        self.parts = None
+        self.nparts = None
         self.part_digests = None
         self.etag = None
         self.abort_on_failure_to_complete = abort_on_failure_to_complete
@@ -30,26 +37,45 @@ class S3MultiPartUpload(object):
         self.upload_id = self._create_upload()
 
     def _create_upload(self):
-        return self.client.create_multipart_upload(Bucket = self.bucket, Key = self.key)["UploadId"]
+        return boto3.client("s3").create_multipart_upload(Bucket = self.bucket, Key = self.key)["UploadId"]
+    
     def _upload_part(self, partnumber, partpath, parthash):
         start = time.time()
         with open(partpath, 'rb') as fopen:
             try:
-                self.client.upload_part(Bucket = self.bucket, Key = self.key, UploadId = self.upload_id, PartNumber = partnumber, Body = fopen, ContentMD5 = parthash)
+                boto3.client("s3").upload_part(Bucket = self.bucket, Key = self.key, UploadId = self.upload_id, PartNumber = partnumber, Body = fopen, ContentMD5 = parthash)
             except botocore.exceptions.ClientError:
                 self._abort()
                 raise
         logging.info(f"Uploaded part #{partnumber}: {partpath} - {time.time()-start} seconds")
-
+    
     def upload_parts(self, part_fnames):
         self.part_fnames = part_fnames
+        self.nparts = len(part_fnames)
+        self.parts = {pn: pf for pn,pf in zip(range(1,self.nparts+1), self.part_fnames)}
+        if self.nparts < self.nproc:
+            logging.info(f"Only using as many processes as there are parts: {self.nparts}")
+            self.nproc = self.nparts
         logging.info(f"Part filenames (IN THIS ORDER): {self.part_fnames}")
-        self.part_digests = S3MultiPartUpload._md5_digest_parts(self.part_fnames)
-        parts = zip(range(1, len(self.part_fnames)+1), self.part_fnames, S3MultiPartUpload._encode_b64(self.part_digests)
-)
-        with Pool(self.nproc) as p:
-            p.map(self._upload_part, parts)
-    
+        print(self.parts)
+        self.part_digests = S3MultiPartUpload._md5_digest_parts(self.part_fnames, self.nproc)
+        #print('\n'.join([str(x) for x in self.part_digests]))
+
+        #parts = zip(range(1, len(self.part_fnames)+1), self.part_fnames, S3MultiPartUpload._encode_b64(self.part_digests))
+        logging.info(f"Started uploading {self.nparts} parts.")
+        start = time.time()
+        with ProcessPool(nodes=self.nproc) as p:
+            p.map(self._upload_part, self.parts.keys(), self.parts.values(), S3MultiPartUpload._encode_b64(self.part_digests))
+   
+        logging.info(f"Total upload time ({self.nparts} parts): {time.time()-start} seconds")
+
+        self.delete_part_files()
+
+    def delete_part_files(self):
+        for pf in self.part_fnames:
+            os.remove(pf)
+        logging.info(f"Removed {len(self.parts)} part files: {self.part_fnames})")
+
     def _generate_etag (self):
         if self.part_fnames is not None and self.part_digests is not None:
             self.etag =  f"{md5hash( io.BytesIO(b''.join(self.part_digests)) ).hexdigest()}-{len(self.part_digests)}"
@@ -65,12 +91,19 @@ class S3MultiPartUpload(object):
     def _encode_b64(part_digests):
         return [base64.b64encode(x).decode("utf-8") for x in part_digests]
     
-    def _md5_digest_parts(part_fnames):
-        return [md5hash(open(x, 'rb')).digest() for x in part_fnames]
+    def _md5_digest_parts(part_fnames, local_nproc = 1):
+        logging.info(f"Generating md5 digests for {len(part_fnames)} file parts.")
+        streams = [open(x, 'rb') for x in part_fnames]
+        with ProcessPool(local_nproc) as p:
+            digests = p.map(lambda x: md5hash(x).digest(), streams)
+        close_streams = [x.close() for x in streams]
+        return digests
+        
+        #return [md5hash(open(x, 'rb')).digest() for x in part_fnames]
 
     def list_parts(self):
         try:
-            r = self.client.list_parts(Bucket = self.bucket, Key = self.key, UploadId = self.upload_id)
+            r = boto3.client("s3").list_parts(Bucket = self.bucket, Key = self.key, UploadId = self.upload_id)
         except botocore.exceptions.ClientError:
             self._abort()
             raise
@@ -84,7 +117,7 @@ class S3MultiPartUpload(object):
         multiparts = {"Parts": [{"PartNumber": p["PartNumber"], "ETag": p["ETag"]} for p in self.list_parts()]}
 
         try:
-            r = self.client.complete_multipart_upload(Bucket = self.bucket, Key = self.key, UploadId = self.upload_id, MultipartUpload=multiparts) 
+            r = boto3.client("s3").complete_multipart_upload(Bucket = self.bucket, Key = self.key, UploadId = self.upload_id, MultipartUpload=multiparts) 
         except:
             self._abort()
         remote_etag = r["ETag"].replace('"', '') 
@@ -100,7 +133,7 @@ class S3MultiPartUpload(object):
             logging.critical("Unable to abort prior to creation.")
             raise ValueError
         try:
-            self.client.abort_multipart_upload(Bucket = self.bucket, Key = self.key, UploadId = self.upload_id)
+            boto3.client("s3").abort_multipart_upload(Bucket = self.bucket, Key = self.key, UploadId = self.upload_id)
             logger.critical("Upload aborted successfully.")
         except botocore.exceptions.ClientError:
             logging.critical(f"Unable to abort MultipartUpload. It will have to be done manually:\n{'-'*25}\naws s3api abort-multipart-upload --bucket {self.bucket} --key {self.key} --upload-id {self.upload_id}")
@@ -159,13 +192,16 @@ if __name__ == "__main__":
     parser.add_argument("-k", "--key", action = "store", help = "")
     parser.add_argument("-s", "--partsize", action = "store", help = "", default = 4950000000)
     parser.add_argument("-f", "--largefile", action = "store", help = "")
-    parser.add_argument("-p", "--nproc", action = "store", type = int, help = "")
+    parser.add_argument("-p", "--nproc", action = "store", default = cpu_count(), type = int, help = "")
     args = parser.parse_args()
 
+    logging.info(f"Uploading with up to {args.nproc} processes (default = detected CPUS ({cpu_count()}))")
+
+    logging.info(f"Splitting {args.largefile} ({float(os.stat(args.largefile).st_size)/float(1e9)} Gb) into parts. ")
     part_fnames = make_file_parts(args.largefile, part_size = args.partsize)
 
     # Begin interactions with S3
-    mpu = S3MultiPartUpload(args.bucket, args.key, nproc = args.npro)
+    mpu = S3MultiPartUpload(args.bucket, args.key, nproc = args.nproc)
     mpu.upload_parts(part_fnames)
     mpu.complete_upload()
 
