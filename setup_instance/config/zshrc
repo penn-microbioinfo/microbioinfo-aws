@@ -1,3 +1,5 @@
+WHEREAMI=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+
 LS_COLORS='no=00;37:fi=00:di=00;33:ln=04;36:pi=40;33:so=01;35:bd=40;33;01:*.pdf=00;95'
 export LS_COLORS
 zstyle ':completion:*' list-colors ${(s.:.)LS_COLORS}
@@ -13,6 +15,8 @@ autoload -Uz compinit
 compinit
 # End of lines added by compinstall
 
+. $WHEREAMI/local_zshrc
+
 # History things
 setopt INC_APPEND_HISTORY
 setopt EXTENDED_HISTORY
@@ -24,11 +28,13 @@ export HISTSIZE=1000000000
 export SAVEHIST=1000000000
 
 # Prompt
-PROMPT="%F{207}[local]%f %F{222}%n@%M%f %F{038}%3/%f %F{131}>>>%f "
+if [ -n "$SSH_CLIENT" ] || [ -n "$SSH_TTY" ]; then
+	local_or_remote="%F{46}[remote]%f"
+else
+	local_or_remote="%F{207}[local]%f"
+fi
+PROMPT="${local_or_remote} %F{222}%n@%M%f %F{038}%3/%f %F{131}>>>%f "
 
 alias ls="ls --color=auto"
 alias history="history 0"
 alias lsblk="lsblk -o NAME,PARTUUID,SIZE,TYPE,MOUNTPOINTS"
-alias awsenv='source /home/ubuntu/pyenvs/pennaws/bin/activate'
-alias awsauth='awsenv; python /home/ubuntu/lib/aws-federated-auth/aws-federated-auth.py; export AWS_PROFILE=445654575720-BushmanLabPostdoc'
-alias vim="nvim"
