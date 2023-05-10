@@ -73,3 +73,8 @@ Tags:
   - Key: BillTo
     Value:  microbioinfo
 ```
+
+#### STOP/START compute fleet
+```
+pcluster update-compute-fleet -n microbioinfo-clust --status [START/STOP]_REQUESTED -r us-east-1
+```
