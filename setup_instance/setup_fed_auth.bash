@@ -18,6 +18,10 @@ mkdir $HOME/pyenvs
 cd $HOME/pyenvs
 python3 -m venv pennaws
 source pennaws/bin/activate
+
+pip install "python-dateutil<3.0.0,>=2.1"
+pip install " urllib3<1.27,>=1.25.4"
+
 cd $HOME/lib
 
 cd pennshib
@@ -30,6 +34,6 @@ cd ../
 
 #echo "export AWS_PROFILE=445654575720-BushmanLabPostdoc" >> $HOME/.zshrc
 if [[ $(grep -c 'alias aws' $HOME/.zshrc) -eq 0 ]]; then
-    echo "alias awsenv='source $HOME/pyenvs/pennaws/bin/activate'" >> $HOME/.zshrc
-    echo "alias awsauth='awsenv; python ${HOME}/lib/aws-federated-auth/aws-federated-auth.py; export AWS_PROFILE=445654575720-BushmanLabPostdoc'" >> $HOME/.zshrc
+    echo "alias awsenv='source $HOME/pyenvs/pennaws/bin/activate'" >> $HOME/.bashrc
+    echo "alias awsauth='awsenv; python ${HOME}/lib/aws-federated-auth/aws-federated-auth.py; export AWS_PROFILE=445654575720-BushmanLabPostdoc'" >> $HOME/.bashrc
 fi
