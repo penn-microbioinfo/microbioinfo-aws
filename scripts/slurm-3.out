@@ -1,0 +1,8 @@
+Traceback (most recent call last):
+  File "/shared-ebs/microbioinfo-aws/scripts//s3-download-multi.py", line 6, in <module>
+    from pathos.multiprocessing import ProcessPool
+ModuleNotFoundError: No module named 'pathos'
+error: Invalid value "/scratch/ref/refdata-gex-GRCh38-2020-A" for '--transcriptome <PATH>': No such file or directory
+
+For more information try --help
+mv: cannot stat ‘Pla_HDBR8715514/outs/filtered_feature_bc_matrix’: No such file or directory

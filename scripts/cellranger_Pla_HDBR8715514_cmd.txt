@@ -1,0 +1,1 @@
+cellranger count --fastqs /scratch/simoni_ref/emtab_12421 --transcriptome /scratch/ref/cellranger/refdata-gex-GRCh38-2020-A --id Pla_HDBR8715514 --sample Pla_HDBR8715514 --include-introns false --localcores 8 --localmem 62 --chemistry auto && mv Pla_HDBR8715514/outs/filtered_feature_bc_matrix Pla_HDBR8715514_filtered_feature_bc_matrix && rm -r Pla_HDBR8715514
