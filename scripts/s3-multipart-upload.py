@@ -1,4 +1,7 @@
 import boto3
+import time
+import uuid
+import shutil
 import io
 import botocore
 import json
@@ -125,7 +128,7 @@ class S3MultiPartUpload(object):
         streams = [open(x, 'rb') for x in [p.fname for p in parts]]
         with ProcessPool(local_nproc) as p:
             digests = p.map(lambda x: both_digests(x), streams)
-        close_streams = [x.close() for x in streams]
+        _close_streams = [x.close() for x in streams]
         for i,p in enumerate(parts):
             p.digest = digests[i][0]
             p.hexdigest = digests[i][1]
@@ -160,7 +163,7 @@ class S3MultiPartUpload(object):
             if local != remote_etags[idx]:
                 return False 
         return True
-        return True
+
     def complete_upload(self):
         
         if not self._uploaded_parts_in_correct_order():
@@ -242,7 +245,13 @@ def check_final_etag(local_etag, remote_etag):
         sys.exit(1)
 
 if __name__ == "__main__":
-    logging.basicConfig(encoding='utf-8', level=logging.INFO)
+
+    # Should probably just call the logger myself instead of using basicConfig
+    # to avoid this annoying logic
+    if float(".".join(sys.version.split(" ")[0].split(".")[0:2])) >= 3.9: 
+        logging.basicConfig(encoding='utf-8', level=logging.INFO)
+    else:
+        logging.basicConfig(level=logging.INFO)
     parser = argparse.ArgumentParser()
     parser.add_argument("-b", "--bucket", action = "store", help = "")
     parser.add_argument("-k", "--key", action = "store", help = "")
@@ -255,14 +264,20 @@ if __name__ == "__main__":
 
     logging.info(f"Generating MD5 for {args.largefile} in background.")
     logging.info(f"Splitting {args.largefile} ({float(os.stat(args.largefile).st_size)/float(1e9)} Gb) into parts. ")
+   
+    largefile_path = os.path.realpath(args.largefile)
+    unique_dirname = str(uuid.uuid4())
+    logging.info(f"Creating temporary directory to populate with file parts: {unique_dirname}")
+    os.mkdir(unique_dirname)
+    os.chdir(unique_dirname)
 
-    md5p = subprocess.Popen(["md5sum", args.largefile], stdout = subprocess.PIPE, stderr = subprocess.PIPE)
-    part_fnames = make_file_parts(args.largefile, part_size = args.partsize)
+    md5p = subprocess.Popen(["md5sum", largefile_path], stdout = subprocess.PIPE, stderr = subprocess.PIPE)
+    part_fnames = make_file_parts(largefile_path, part_size = args.partsize)
     out,err = md5p.communicate()
     if md5p.returncode != 0:
         raise OSError(err)
     else:
-        with open(f"{args.largefile}.md5", 'wb') as largefile_md5:
+        with open(f"{largefile_path}.md5", 'wb') as largefile_md5:
             largefile_md5.write(out)
             
 
@@ -271,6 +286,12 @@ if __name__ == "__main__":
     mpu.upload_parts(part_fnames)
     mpu.complete_upload()
 
-
+    logging.shutdown()
     
+    # On AWS, a .nfsXXXX file is created that doesn't get removed until
+    # after script closes, so can't do anything about it here - yet...
+    # Just call script from a different directory and then you can delete 
+    # all the uuid-named directories
+    #os.chdir("../")
+    #os.rmdir(unique_dirname)
 

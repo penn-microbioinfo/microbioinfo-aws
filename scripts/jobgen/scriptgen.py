@@ -48,3 +48,4 @@ class SlurmScriptGenerator(object):
     def write(self):
         with open(f"{self.jobname}.sh", 'w') as f:
             f.write(self.__repr__())
+            f.write("\n")
