@@ -1,4 +1,0 @@
-INFO:botocore.credentials:Found credentials in shared credentials file: /shared-ebs/.aws/credentials
-ERROR: Permission denied: Error reading fastq directory "/local-ebs" due to:
-Permission denied (os error 13)
-mv: cannot stat ‘Pla_HDBR8715514/outs/filtered_feature_bc_matrix’: No such file or directory
