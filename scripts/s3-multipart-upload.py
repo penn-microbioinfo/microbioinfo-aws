@@ -198,6 +198,11 @@ class S3MultiPartUpload(object):
             logging.critical(f"Unable to abort MultipartUpload. It will have to be done manually:\n{'-'*25}\naws s3api abort-multipart-upload --bucket {self.bucket} --key {self.key} --upload-id {self.upload_id}")
             raise
 
+    def upload_md5(self, md5_key, md5_bytes):
+        assert os.path.dirname(md5_key) == os.path.dirname(self.key), "Dirnames for largefile key and md5 do not match"
+        assert f"{os.path.basename(self.key)}.md5" == os.path.basename(md5_key), "MD5 base key does not match the large file name + .md5"
+        boto3.client("s3").put_object(Bucket = self.bucket, Key = md5_key, Body = md5_bytes)
+
 def get_upload_id(response):
     return response["UploadId"]
 
@@ -273,20 +278,25 @@ if __name__ == "__main__":
 
     md5p = subprocess.Popen(["md5sum", largefile_path], stdout = subprocess.PIPE, stderr = subprocess.PIPE)
     part_fnames = make_file_parts(largefile_path, part_size = args.partsize)
-    out,err = md5p.communicate()
+    md5_bytes,err = md5p.communicate()
+    md5_key = f"{args.key}.md5"
+    md5_basename = f"{os.path.basename(md5_key)}"
     if md5p.returncode != 0:
         raise OSError(err)
     else:
-        with open(f"{largefile_path}.md5", 'wb') as largefile_md5:
-            largefile_md5.write(out)
-            
+        with open(md5_basename, 'wb') as md5:
+            md5.write(md5_bytes)
 
     # Begin interactions with S3
     mpu = S3MultiPartUpload(args.bucket, args.key, nproc = args.nproc)
     mpu.upload_parts(part_fnames)
+    mpu.upload_md5(md5_key, md5_bytes)
     mpu.complete_upload()
 
     logging.shutdown()
+
+    #print("Sleeping")
+    #time.sleep(20)
     
     # On AWS, a .nfsXXXX file is created that doesn't get removed until
     # after script closes, so can't do anything about it here - yet...
