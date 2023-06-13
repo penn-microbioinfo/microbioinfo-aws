@@ -66,6 +66,8 @@ if args.multiome:
             sg.add_command("cd /local-ebs/cellranger/")
             sg.add_command(exp.print_write_config_cmd())
             sg.add_command(exp.print_cellranger_cmd())
+            sg.add_command(exp.print_move_outs_delete_wd())
+            sg.add_command(exp.print_pull_important_outs_cmd())
             sg.add_command(exp.print_compress_outs_cmd())
             sg.add_command(exp.print_s3_upload_cmd())
         sg.write()

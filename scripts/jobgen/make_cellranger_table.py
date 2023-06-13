@@ -56,7 +56,7 @@ parser.add_argument("--pattern", required = True)
 args = parser.parse_args()
 
 p = re.compile(args.pattern)
-read_num_pat=re.compile("[_](R[0-9])[_]"
+read_num_pat=re.compile("[_](R[0-9])[_]")
 for k in s3_get_object_keys(args.bucket, args.prefix):
     if object_key_matches(p, k):
         key_parts = os.path.split(k)

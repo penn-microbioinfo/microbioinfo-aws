@@ -4,6 +4,7 @@ import argparse
 import sys
 import re
 import csv
+import logging
 
 ''' for EMTAB sheets
 coldict = {
@@ -15,8 +16,30 @@ coldict = {
 '''
 DelimRow = namedtuple("DelimRow", ["protocol", "filename", "read_index", "awsdir"])
 
+def check_multiome_experiments(experiments):
+    nmodals = [len(x.modalities()) for x in experiments]
+    max_modals = max(nmodals)
+    if not all([x == max_modals for x in nmodals]):
+        for exp in experiments:
+            if len(exp.modalities()) != max_modals:
+                maybe_missing_modals = [x for x in experiments if x.identifier == re.sub("[a-z]{1}$", "", exp.identifier)]
+                if len(maybe_missing_modals) > 0:
+                    for mm in maybe_missing_modals:
+                        for m in mm.modalities():
+                            if exp.try_add_modality(m):
+                                print(f"Added missing modality to experiment {exp.identifier}: ({m.super_sample}, {m.type})")
+                                mm.redundant=True
+                    print(exp.modalities())
+                    if len(exp.modalities()) != max_modals:
+                        logging.warning(f"Unable to find missing modalities for {exp.identifier}. Continuing with only: {[m.type for m in exp.modalities()]}")
+    finalized_experiments = []
+    for exp in experiments:
+        if not exp.redundant:
+            finalized_experiments.append(exp)
+    return finalized_experiments
+
 def parse_keys_multiome(keys):
-    multiome_sample_p = re.compile("([0-9]+)[_]([a-zA-Z-]+)[_]([0-9]+)")
+    multiome_sample_p = re.compile("([0-9]+)[_]([a-zA-Z-]+)[_]([0-9]+[a-z]*)[_]")
     super_samples = {}
     assert all([x == [os.path.dirname(y) for y in keys][0] for x in [os.path.dirname(x) for x in keys]]), f"awsdirs vary: {[os.path.dirname(w) for w in keys]}"
     for key in keys:
@@ -25,7 +48,7 @@ def parse_keys_multiome(keys):
         key = keyspl[1]
         s = re.search(multiome_sample_p, key)
         if s is not None:
-            sample = s.group(0)
+            sample = re.sub("[_]$", "", s.group(0))
             super_sample = f"{s.group(1)}_{s.group(3)}"
             modal = s.group(2)
             if not super_sample in super_samples:
@@ -37,7 +60,9 @@ def parse_keys_multiome(keys):
     experiments = []
     for k,v in super_samples.items():
         experiments.append(CellrangerMultiomeExperiment.from_modalities(k,v))
+    experiments = check_multiome_experiments(experiments)
     return experiments
+
 
 class CellrangerModality(object):
     def __init__(self, super_sample, sample, modality, awsdir):
@@ -49,6 +74,7 @@ class CellrangerModality(object):
 class CellrangerMultiomeExperiment(object):
     def __init__(self, ident):
         self.identifier = ident
+        self.redundant = False
         pass
 
     def modalities(self):
@@ -57,6 +83,9 @@ class CellrangerMultiomeExperiment(object):
     def try_add_modality(self, modality: CellrangerModality):
         if modality.type not in self.__dict__:
             setattr(self, modality.type, modality)
+            return True
+        else:
+            return False
 
     def from_modalities(ident, modalities):
         exp = CellrangerMultiomeExperiment(ident)
@@ -145,6 +174,7 @@ class CellrangerMulti(object):
         self.output_key_prefix = output_key_prefix
         self.path_to_outs = f"{self.experiment.identifier}/outs"
         self.archive_name = f"{self.experiment.identifier}.multi.outs.tar.gz"
+        self.important_archive_name = f"{self.experiment.identifier}.multi.importantOuts.tar.gz"
      
     def print_s3_download_cmds(self): 
         cmds=[]
@@ -161,10 +191,20 @@ class CellrangerMulti(object):
     def print_compress_outs_cmd(self):
         if self.archive_name is None or self.output_key_prefix is None:
             raise ValueError("Cannot compress outs whose locations are not known.")
-        return f"tar cvf {self.archive_name} {self.path_to_outs}"
+        return f"tar cvfz {self.archive_name} {self.path_to_outs} && rm -r {self.path_to_outs} && tar cvfz {self.important_archive_name} important_outs && rm -r important_outs"
     
+    def print_pull_important_outs_cmd(self):
+        return f"mkdir important_outs && cp -r {self.path_to_outs}/per_sample_outs/{self.experiment.identifier}/vdj_t important_outs/. && cp {self.path_to_outs}/per_sample_outs/{self.experiment.identifier}/count/sample_filtered_feature_bc_matrix.h5 important_outs/. && cp -r {self.path_to_outs}/per_sample_outs/{self.experiment.identifier}/web_summary.html important_outs/."
+
+    # After cellranger runs, move the outs directory out of rundir and delete rundir (for disk space)
+    def print_move_outs_delete_wd(self):
+        ret = f"mv {self.path_to_outs} .\nrm -r {self.experiment.identifier}"
+        self.path_to_outs = "outs"
+        return ret
     def print_s3_upload_cmd(self):
-        return f"python /shared-ebs/microbioinfo-aws/scripts/s3-multipart-upload.py --bucket microbioinfo-storage --key {os.path.join(self.output_key_prefix, self.archive_name)} --partsize 1000000000 --nproc 8 --largefile {self.archive_name}"
+        out_up = f"python /shared-ebs/microbioinfo-aws/scripts/s3-multipart-upload.py --bucket microbioinfo-storage --key {os.path.join(self.output_key_prefix, self.archive_name)} --partsize 1000000000 --nproc 8 --largefile {self.archive_name}"
+        important_out_up = f"python /shared-ebs/microbioinfo-aws/scripts/s3-multipart-upload.py --bucket microbioinfo-storage --key {os.path.join(self.output_key_prefix, self.important_archive_name)} --partsize 1000000000 --nproc 8 --largefile {self.important_archive_name}"
+        return '\n'.join([out_up, important_out_up])
 
 class CellrangerMultiConfigSection(object):
     def __init__(self, name):
