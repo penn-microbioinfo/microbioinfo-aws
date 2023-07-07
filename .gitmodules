@@ -1,3 +1,6 @@
 [submodule "submodules/neovim-config"]
 	path = submodules/neovim-config
 	url = git@github.com:amsesk/neovim-config.git
+[submodule "submodules/mbiaws"]
+	path = submodules/mbiaws
+	url = git@github.com:penn-microbioinfo/mbiaws.git
