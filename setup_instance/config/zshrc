@@ -37,4 +37,4 @@ PROMPT="${local_or_remote} %F{222}%n@%M%f %F{038}%3/%f %F{131}>>>%f "
 
 alias ls="ls --color=auto"
 alias history="history 0"
-alias lsblk="lsblk -o NAME,PARTUUID,SIZE,TYPE,MOUNTPOINTS"
+alias lsblk="lsblk -o NAME,UUID,SIZE,TYPE,MOUNTPOINTS"
