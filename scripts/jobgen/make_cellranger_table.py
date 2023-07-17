@@ -3,21 +3,7 @@ import sys
 import argparse
 import re
 import os
-
-def s3_get_object_keys(Bucket, Prefix):
-    client = boto3.client("s3")
-    paginator = client.get_paginator("list_objects")
-    pages = paginator.paginate(Bucket = Bucket, Prefix = Prefix)
-    for page in pages:
-        for obj in page["Contents"]:
-            yield obj["Key"]
-
-def object_key_matches(pattern, objkey):
-    s = re.search(pattern, objkey)
-    if s is not None:
-        return True
-    else:
-        return False
+from mbiaws.s3.lib import list_object_keys, object_key_matches
 
 def object_read_number(pattern, objkey):
     s = re.search(pattern, os.path.basename(objkey))
@@ -57,7 +43,7 @@ args = parser.parse_args()
 
 p = re.compile(args.pattern)
 read_num_pat=re.compile("[_](R[0-9])[_]")
-for k in s3_get_object_keys(args.bucket, args.prefix):
+for k in list_object_keys(args.bucket, args.prefix):
     if object_key_matches(p, k):
         key_parts = os.path.split(k)
         print("\t".join([object_protocol_type(key_parts[1], protocol_converter = emtab_style_protocol_converter), key_parts[1], object_read_number(read_num_pat,k), key_parts[0]]))

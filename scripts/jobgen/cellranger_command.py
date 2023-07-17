@@ -5,7 +5,7 @@ import sys
 import re
 import csv
 import logging
-
+from mbiaws.s3.lib import list_object_keys, object_key_matches
 ''' for EMTAB sheets
 coldict = {
         9: "protocol",
@@ -15,6 +15,69 @@ coldict = {
         }
 '''
 DelimRow = namedtuple("DelimRow", ["protocol", "filename", "read_index", "awsdir"])
+
+multiome_sample_p = re.compile("([0-9]+)[_]([a-zA-Z-]+)[_]([0-9]+[a-z]*)[_]")
+super_sample_p = re.compile("^([0-9]+)[_]([0-9]+[a-z]*)")
+def get_patient_id(super_sample):
+    return re.search(super_sample_p, super_sample).group(1)
+
+def groupby_patient_id(super_samples: list):
+    grp = {}
+    for ss in super_samples:
+        pid = get_patient_id(ss)
+        if pid in grp:
+            grp[pid].append(ss)
+        else:
+            grp[pid] = [ss]
+    return grp
+class CellrangerAggrCommand(object):
+    def __init__(self, pid, mode = "count", origin_mod = "coculture"):
+        self.pid = pid
+        self.csv = None
+        self.to_fetch = None
+        self.to_fetch_bases = None
+        self.origin_mod = origin_mod
+        if mode in ["count", "vdj", "multi"]:
+            self.mode = mode
+        else:
+            raise ValueError(f"Invalid CellrangerAggrCommand mode: {mode}")
+    def generate_csv(self):
+        csv = None
+        if self.mode == "count":
+            csv = "sample_id,molecule_h5\n"
+            for k in self.to_fetch_bases:
+                ss=re.search(super_sample_p, k).group(0)
+                csv += f"{ss},../multi/{ss}/outs/per_sample_outs/{ss}/count/sample_molecule_info.h5\n"
+        elif self.mode == "multi":
+            csv = "sample_id,sample_outs,donor,origin\n"
+            for k in self.to_fetch_bases:
+                ss=re.search(super_sample_p, k).group(0)
+                csv += f"{ss},../multi/{ss}/outs/per_sample_outs/{ss},{self.pid},{self.pid}_{self.origin_mod}\n"
+        else:
+            csv = "sample_id,vdj_contig_info,donor,origin\n"
+            for k in self.to_fetch_bases:
+                ss=re.search(super_sample_p, k).group(0)
+                csv += f"{ss},../multi/{ss}/outs/per_sample_outs/{ss}/vdj_t/,{self.pid}_{self.origin_mod}n"
+        self.csv = csv 
+        return self.csv
+        
+    def from_s3_archive_keys(pid, archive_keys, mode = "count"):
+        archive_bases = [os.path.basename(x) for x in archive_keys]
+        cmd = CellrangerAggrCommand(pid, mode=mode)
+        cmd.to_fetch = archive_keys
+        cmd.to_fetch_bases = archive_bases
+        cmd.generate_csv()
+        return cmd
+    def awsdirs(self):
+        return set([os.path.dirname(p) for p in self.to_fetch])
+class CellrangerAggrGroups(object):
+    def __init__(self):
+        self.groups = {}
+    def insert(self, pid, value):
+        if pid in self.groups:
+            self.groups[pid].append(value)
+        else:
+            self.groups[pid] = [value]
 
 def check_multiome_experiments(experiments):
     nmodals = [len(x.modalities()) for x in experiments]
@@ -39,7 +102,6 @@ def check_multiome_experiments(experiments):
     return finalized_experiments
 
 def parse_keys_multiome(keys):
-    multiome_sample_p = re.compile("([0-9]+)[_]([a-zA-Z-]+)[_]([0-9]+[a-z]*)[_]")
     super_samples = {}
     assert all([x == [os.path.dirname(y) for y in keys][0] for x in [os.path.dirname(x) for x in keys]]), f"awsdirs vary: {[os.path.dirname(w) for w in keys]}"
     for key in keys:
@@ -198,7 +260,7 @@ class CellrangerMulti(object):
 
     # After cellranger runs, move the outs directory out of rundir and delete rundir (for disk space)
     def print_move_outs_delete_wd(self):
-        ret = f"mv {self.path_to_outs} .\nrm -r {self.experiment.identifier}"
+        ret = f"if [ -d outs ]; then rm -r outs; fi; if [ -d important_outs ]; then rm -r important_outs; fi; mv {self.path_to_outs} .\nrm -r {self.experiment.identifier}"
         self.path_to_outs = "outs"
         return ret
     def print_s3_upload_cmd(self):
