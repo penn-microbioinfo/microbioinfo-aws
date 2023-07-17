@@ -7,6 +7,21 @@ import subprocess
 import datetime
 
 cpuidlelog_path = '/var/shutdown-when-idle-empty'
+free_out_pat = re.compile("^Mem[:][\s]+([0-9]+)[\s]+([0-9]+)[\s]+([0-9]+).+$")
+
+def current_mem_usage():
+    p = subprocess.Popen(["free", "-b"], stdout = subprocess.PIPE, stderr = subprocess.PIPE)
+    out,err = p.communicate()
+    if p.returncode != 0:
+        raise OSError(err)
+    else:
+        out = out.decode("utf-8")
+        for line in out.split('\n'):
+            s = re.search(free_out_pat, line)
+            if s is not None:
+                total, used, free = s.groups()
+                print(total, used, free)
+                break
 
 def current_cpu_idle():
     ps =subprocess.Popen(['bash', '/opt/shutdown-when-idle-empty/current_cpu_idle.bash'], stdout = subprocess.PIPE, stderr = subprocess.PIPE)
