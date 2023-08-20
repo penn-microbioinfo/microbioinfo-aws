@@ -15,7 +15,7 @@ autoload -Uz compinit
 compinit
 # End of lines added by compinstall
 
-. $WHEREAMI/local_zshrc
+. $WHEREAMI/.zshrc_local
 
 # History things
 setopt INC_APPEND_HISTORY
@@ -38,3 +38,13 @@ PROMPT="${local_or_remote} %F{222}%n@%M%f %F{038}%3/%f %F{131}>>>%f "
 alias ls="ls --color=auto"
 alias history="history 0"
 alias lsblk="lsblk -o NAME,UUID,SIZE,TYPE,MOUNTPOINTS"
+
+
+awsmnt() {
+    if [ ! -z SAWSMOUNTDIR ]; then
+        sshfs ubuntu@${1}:/home/ubuntu $AWSMOUNTDIR 
+    else
+        echo "AWSMOUNTDIR unset"
+        exit 1
+    fi
+}
