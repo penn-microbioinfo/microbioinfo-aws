@@ -17,7 +17,7 @@ fi
 
 # Setup neovim
 wget https://github.com/neovim/neovim/releases/download/stable/nvim-linux64.tar.gz
-mv nvim-linux.tar.gz $HOME/pkgs/.
+mv nvim-linux64.tar.gz $HOME/pkgs/.
 cd $HOME/pkgs
 tar xvf  nvim-linux64.tar.gz
 chmod u+x $HOME/pkgs/nvim-linux64/bin/nvim
