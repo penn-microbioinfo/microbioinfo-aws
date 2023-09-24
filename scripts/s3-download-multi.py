@@ -7,6 +7,7 @@ import codecs
 from pathos.multiprocessing import ProcessPool
 from pathos.helpers import cpu_count
 
+'''
 def list_files(bucket, prefix):
     olist = boto3.client("s3").list_objects(Bucket = bucket, Prefix = prefix)
     if olist["IsTruncated"]:
@@ -16,6 +17,17 @@ def list_files(bucket, prefix):
         return olist["Contents"]
     else:
         raise OSError(f"`{prefix}` does not match any objects in bucket `{bucket}`")
+'''
+def list_files(bucket, prefix):
+    objnames = []
+    pag = boto3.client("s3").get_paginator("list_objects")
+    page_itr = pag.paginate(Bucket = bucket, Prefix = prefix)
+
+    for page in page_itr:
+        for i in page["Contents"]:
+            yield i
+            #objnames.append(i["Key"])
+    #return objnames
 
 def _get_file(key, bucket, chunksize = 1.024e6, do_not_overwrite = False):
     getobj = boto3.client("s3").get_object(Bucket = bucket, Key = key)
@@ -27,11 +39,10 @@ def _get_file(key, bucket, chunksize = 1.024e6, do_not_overwrite = False):
             for chunk in getobj["Body"].iter_chunks():
                 local.write(chunk)
     
-
 def get_files(keylist, bucket, nproc, chunksize = 1.024e6, do_not_overwrite=False):
     buckets = [bucket]*len(keylist)
     with ProcessPool(nodes = nproc) as p:
-        p.map(_get_file, keylist, buckets, do_not_overwrite=do_not_overwrite)
+        p.map(_get_file, keylist, buckets, ([chunksize],)*len(keylist), ([do_not_overwrite],)*len(keylist))
 
 if __name__ == "__main__":
     # Python > 3.8
@@ -40,7 +51,7 @@ if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO)
     parser = argparse.ArgumentParser()
     parser.add_argument("-b", "--bucket", action = "store", help = "")
-    parser.add_argument("--do_not_overwrite", action = "store_true", help = "Overwrite files that exist. Default: skip over")
+    parser.add_argument("--do_not_overwrite", action = "store_true", help = "Don't overwrite files that exist. Default: overwrite")
     parser.add_argument("-k", "--prefix", action = "store", help = "Prefix for objects to download (i.e., the bucket directory).")
     parser.add_argument("-p", "--nproc", action = "store", default = cpu_count(), type = int, help = "")
     parser.add_argument("--chunksize",  action = "store", default = 1.024e6, type = float, help = "")
@@ -48,8 +59,9 @@ if __name__ == "__main__":
     args = parser.parse_args()
     
     p = re.compile(args.pattern)
-
-    get_files([x["Key"] for x in list_files(args.bucket, args.prefix) if re.search(p, x["Key"]) is not None], args.bucket, nproc=args.nproc, chunksize=args.chunksize, do_not_overwrite = args.do_not_overwrite)
+    oblist = [x["Key"] for x in list_files(args.bucket, args.prefix) if re.search(p, x["Key"]) is not None]
+    print(oblist)
+    get_files(oblist, args.bucket, nproc=args.nproc, chunksize=args.chunksize, do_not_overwrite = args.do_not_overwrite)
 
 
 
