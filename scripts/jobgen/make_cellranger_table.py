@@ -32,7 +32,8 @@ emtab_style_protocol_converter = {
         "RNA": "scRNA-seq",
         "VDJ": "scVDJ-seq",
         "ADT": "scADT-seq",
-        "snRNA-seq": "scADT-seq"
+        "snRNA-seq": "scADT-seq",
+        "HTO": "HTO",
         }
 
 parser = argparse.ArgumentParser()
@@ -46,4 +47,4 @@ read_num_pat=re.compile("[_](R[0-9])[_]")
 for k in list_object_keys(args.bucket, args.prefix):
     if object_key_matches(p, k):
         key_parts = os.path.split(k)
-        print("\t".join([object_protocol_type(key_parts[1], protocol_converter = emtab_style_protocol_converter), key_parts[1], object_read_number(read_num_pat,k), key_parts[0]]))
+        print("\t".join([object_protocol_type(key_parts[1], protocol_converter = emtab_style_protocol_converter, pos=2), key_parts[1], object_read_number(read_num_pat,k), key_parts[0]]))
