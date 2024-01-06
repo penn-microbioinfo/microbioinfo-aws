@@ -14,11 +14,16 @@ if [ ! -d $HOME/.config ]; then
     mkdir $HOME/.config
 fi
 
+#Install node.js if needed
+if ! which node; then
+    curl -sL install-node.vercel.app/lts | sudo bash
+fi
+
 # Setup neovim
 cd $HOME/pkgs
 wget https://github.com/neovim/neovim/releases/download/stable/nvim-linux64.tar.gz
 tar xvf  nvim-linux64.tar.gz
 chmod u+x $HOME/pkgs/nvim-linux64/bin/nvim
 sudo rm /usr/bin/vim
-sudo ln -s /home/ubuntu/pkgs/nvim-linux64/bin/nvim /usr/bin/vim
-ln -s $PATH_TO_MBIAWS/microbioinfo-aws/setup_instance/config/nvim $HOME/.config/.
+sudo ln -sf $HOME/pkgs/nvim-linux64/bin/nvim /usr/bin/vim
+ln -sf $PATH_TO_MBIAWS/microbioinfo-aws/setup_instance/config/nvim $HOME/.config/.
