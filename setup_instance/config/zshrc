@@ -29,16 +29,16 @@ export SAVEHIST=1000000000
 
 # Prompt
 if [ -n "$SSH_CLIENT" ] || [ -n "$SSH_TTY" ]; then
-	local_or_remote="%F{46}[remote]%f"
+	local_or_remote="%F{#dcde7b}[remote]%f"
 else
-	local_or_remote="%F{207}[local]%f"
+	local_or_remote="%F{#ab3834}[local]%f"
 fi
-PROMPT="${local_or_remote} %F{222}%n@%M%f %F{038}%3/%f %F{131}>>>%f "
+PROMPT="${local_or_remote} %F{#f3dab1}%n@%M%f %F{#2f97c6}%3/%f %F{#cc8a3e}>>>%f "
 
 alias ls="ls --color=auto"
 alias history="history 0"
 alias lsblk="lsblk -o NAME,UUID,SIZE,TYPE,MOUNTPOINTS"
-
+alias vim="nvim"
 
 awsmnt() {
     if [ ! -z SAWSMOUNTDIR ]; then
@@ -48,3 +48,7 @@ awsmnt() {
         exit 1
     fi
 }
+
+[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
+
+

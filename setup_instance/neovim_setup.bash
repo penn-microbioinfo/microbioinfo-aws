@@ -10,20 +10,20 @@ if [ ! -d $HOME/pkgs ]; then
 	mkdir $HOME/pkgs
 fi
 
- Install node.js if needed
+if [ ! -d $HOME/.config ]; then
+    mkdir $HOME/.config
+fi
+
+#Install node.js if needed
 if ! which node; then
-    curl -sL install-node.vercel.app/lts | sudo bash # Install node.js for coc
+    curl -sL install-node.vercel.app/lts | sudo bash
 fi
 
 # Setup neovim
-wget https://github.com/neovim/neovim/releases/download/stable/nvim-linux64.tar.gz
-mv nvim-linux64.tar.gz $HOME/pkgs/.
 cd $HOME/pkgs
+wget https://github.com/neovim/neovim/releases/download/stable/nvim-linux64.tar.gz
 tar xvf  nvim-linux64.tar.gz
 chmod u+x $HOME/pkgs/nvim-linux64/bin/nvim
 sudo rm /usr/bin/vim
-sudo ln -s /home/ubuntu/pkgs/nvim-linux64/bin/nvim /usr/bin/vim
-git clone --depth 1 https://github.com/wbthomason/packer.nvim $HOME/.local/share/nvim/site/pack/packer/start/packer.nvim
-#git clone https://github.com/penn-microbioinfo/microbioinfo-aws.git $HOME/microbioinfo-aws
-mkdir -p $HOME/.config
-ln -s $PATH_TO_MBIAWS/microbioinfo-aws/setup_instance/config/nvim $HOME/.config/.
+sudo ln -sf $HOME/pkgs/nvim-linux64/bin/nvim /usr/bin/vim
+ln -sf $PATH_TO_MBIAWS/microbioinfo-aws/setup_instance/config/nvim $HOME/.config/.
