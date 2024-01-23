@@ -159,9 +159,9 @@ class CellrangerCommand(object):
     def __init__(self, protocol, protocol_to_ref = None, **kwargs):
         if protocol_to_ref is None:
             self.protocol_to_ref = {
-                "scRNA-seq": "/cellranger-human-ref/refdata-gex-GRCh38-2020-A",
-                "scVDJ-seq": "/cellranger-human-ref/refdata-cellranger-vdj-GRCh38-alts-ensembl-7.1.0",
-                "scADT-seq": "/cellranger-human-ref/TotalSeq_C_Human_Universal_Cocktail_399905_Antibody_reference_UMI_counting.csv" 
+                "scRNA-seq": "/cellranger-ref/refdata-gex-mm10-2020-A",
+                "scVDJ-seq": "/cellranger-ref/refdata-cellranger-vdj-GRCh38-alts-ensembl-7.1.0",
+                "scADT-seq": "/cellranger-ref/TotalSeq_C_Human_Universal_Cocktail_399905_Antibody_reference_UMI_counting.csv" 
                 }
         else:
             self.protocol_to_ref = protocol_to_ref
@@ -248,7 +248,7 @@ class CellrangerMulti(object):
         return f"cat << EOF > config.csv\n{self.config}\nEOF"
 
     def print_cellranger_cmd(self):
-        return f"cellranger {self.subcommand} --id {self.experiment.identifier} --csv config.csv --localcores 8 --localmem 58"
+        return f"cellranger {self.subcommand} --id {self.experiment.identifier} --csv config.csv --localcores 16 --localmem 58"
 
     def print_compress_outs_cmd(self):
         if self.archive_name is None or self.output_key_prefix is None:
