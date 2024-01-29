@@ -14,7 +14,8 @@ def is_empty(cmd_chunk):
         return False
 
 modality_to_ref = {
-    "RNA": "/cellranger-human-ref/refdata-gex-GRCh38-2020-A",
+    #"RNA": "/cellranger-human-ref/refdata-gex-GRCh38-2020-A",
+    "RNA": "/cellranger-ref/refdata-gex-mm10-2020-A",
     "VDJ": "/cellranger-human-ref/refdata-cellranger-vdj-GRCh38-alts-ensembl-7.1.0",
     "ADT": "/cellranger-human-ref/TotalSeq_C_Human_Universal_Cocktail_399905_Antibody_reference_UMI_counting.csv" 
     }
@@ -74,7 +75,7 @@ if args.multiome:
 else:
     chunks = np.array_split(list(cc.cellranger_commands(args.table, key_prefix = args.s3_output_prefix).values()), args.splits)
 
-    for i,cmd_chunk in enumerate():
+    for i,cmd_chunk in enumerate(chunks):
         if is_empty(cmd_chunk):
             raise ValueError(f"Empty command chunk passed at index {i}. Check input table or number of splits requested.")
         sg = scriptgen.SlurmScriptGenerator(
@@ -82,9 +83,9 @@ else:
                 nodes=1,
                 tasks_per_node=1,
                 cpus_per_task=8,
-                mem=60,
+                mem=30,
                 time=168,
-                partition="r5ad"
+                partition="m6id"
                 )
         for sc in setup_cmds:
             sg.add_command(sc)
