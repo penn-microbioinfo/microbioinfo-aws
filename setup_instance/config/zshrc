@@ -27,6 +27,10 @@ export HISTFILESIZE=1000000000
 export HISTSIZE=1000000000
 export SAVEHIST=1000000000
 
+pyenv () {
+    source ~/pyenvs/$1/bin/activate
+}
+
 # Prompt
 if [ -n "$SSH_CLIENT" ] || [ -n "$SSH_TTY" ]; then
 	local_or_remote="%F{#dcde7b}[remote]%f"
