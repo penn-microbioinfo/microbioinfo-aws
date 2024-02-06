@@ -17,7 +17,12 @@ sudo ln -fs /usr/bin/python3 /usr/bin/python
 #Change shell to zsh
 sudo chsh -s /usr/bin/zsh ubuntu
 rm $HOME/.zshrc
-ln -s $HOME/microbioinfo-aws/setup_instance/config/zshrc $HOME/.zshrc
+ln -s $MBIAWS/setup_instance/config/zshrc $HOME/.zshrc
+
+rm $HOME/.lintr
+rm $HOME/.Rprofile
+ln -s $MBIAWS/setup_instance/config/lintr $HOME/.lintr
+ln -s $MBIAWS/setup_instance/config/lintr $HOME/.Rprofile
 
 if [ "$INSTALL_NEOVIM" == "yes" ]; then
     bash neovim_setup.bash
