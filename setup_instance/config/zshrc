@@ -11,6 +11,8 @@ zstyle ':completion:*' menu select=1
 zstyle ':completion:*' select-prompt %SScrolling active: current selection at %p%s
 zstyle :compinstall filename '/home/amsesk/.zshrc'
 
+bindkey -v '^?' backward-delete-char
+
 autoload -Uz compinit
 compinit
 # End of lines added by compinstall
@@ -26,6 +28,7 @@ export HISTTIMEFORMAT="[%D]"
 export HISTFILESIZE=1000000000
 export HISTSIZE=1000000000
 export SAVEHIST=1000000000
+export R_LIBS_USER="/home/ubuntu/R/x86_64-pc-linux-gnu-library/4.1/"
 
 pyenv () {
     source ~/pyenvs/$1/bin/activate
@@ -42,7 +45,6 @@ PROMPT="${local_or_remote} %F{#f3dab1}%n@%M%f %F{#2f97c6}%3/%f %F{#cc8a3e}>>>%f 
 alias ls="ls --color=auto"
 alias history="history 0"
 alias lsblk="lsblk -o NAME,UUID,SIZE,TYPE,MOUNTPOINTS"
-alias vim="nvim"
 
 awsmnt() {
     if [ ! -z SAWSMOUNTDIR ]; then
@@ -56,3 +58,7 @@ awsmnt() {
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
 
 
+
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
+[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
