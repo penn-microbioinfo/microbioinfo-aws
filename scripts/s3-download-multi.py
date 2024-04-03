@@ -42,7 +42,8 @@ def _get_file(key, bucket, chunksize = 1.024e6, do_not_overwrite = False):
 def get_files(keylist, bucket, nproc, chunksize = 1.024e6, do_not_overwrite=False):
     buckets = [bucket]*len(keylist)
     with ProcessPool(nodes = nproc) as p:
-        p.map(_get_file, keylist, buckets, ([chunksize],)*len(keylist), ([do_not_overwrite],)*len(keylist))
+        #p.map(_get_file, keylist, buckets, ([chunksize],)*len(keylist), ([do_not_overwrite],)*len(keylist))
+        p.map(_get_file, keylist, buckets, do_not_overwrite=do_not_overwrite)
 
 if __name__ == "__main__":
     # Python > 3.8

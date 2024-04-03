@@ -1,0 +1,5 @@
+local({
+  options(
+          lintr.linter_file = "/home/ubuntu/.lintr"
+  )
+})
