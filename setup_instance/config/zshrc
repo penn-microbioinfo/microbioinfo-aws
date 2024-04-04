@@ -30,6 +30,9 @@ export HISTSIZE=1000000000
 export SAVEHIST=1000000000
 export R_LIBS_USER="/home/ubuntu/R/x86_64-pc-linux-gnu-library/4.1/"
 
+icat () {
+    kitty +kitten icat $1
+}
 pyenv () {
     source ~/pyenvs/$1/bin/activate
 }
@@ -55,10 +58,11 @@ awsmnt() {
     fi
 }
 
+# Useful tools
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
+eval "$(zoxide init zsh)"
 
-
-
+# Node
 export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
