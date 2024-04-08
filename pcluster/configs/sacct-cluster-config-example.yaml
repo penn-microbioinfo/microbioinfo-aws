@@ -1,0 +1,49 @@
+Region: xxxxxxxxxxxxxx
+Image:
+  Os: ubuntu2204
+HeadNode:
+  InstanceType: c6a.large
+  Networking:
+    SubnetId: subnet-xxxxxxxxxxxxxx
+  Ssh:
+    KeyName: xxxxxxxxxxxxxx
+  AdditonalSecurityGroups: ["sg-xxxxxxxxxxxxxx"]
+Scheduling:
+  Scheduler: slurm
+  Database: xxxxxxxxxxxxxx
+    Uri: xxxxxxxxxxxxxx
+    UserName: xxxxxxxxxxxxxx
+    PasswordSecretArn: xxxxxxxxxxxxxx
+  SlurmQueues:
+  - Name: m6id
+    CapacityType: ONDEMAND
+    ComputeResources:
+    - Name: m6ilarge
+      Instances:
+      - InstanceType: m6i.large
+      MinCount: 0
+      MaxCount: 2
+    - Name: m6id2xlarge
+      Instances:
+      - InstanceType: m6id.2xlarge
+      MinCount: 0
+      MaxCount: 10
+    Networking:
+      SubnetIds:
+      - subnet-xxxxxxxxxxxxxx
+    Iam:
+      InstanceProfile: xxxxxxxxxxxxxx
+
+SharedStorage:
+  - MountDir: xxxxxxxxxxxxxx
+    Name: xxxxxxxxxxxxxx
+    StorageType: Ebs
+    EbsSettings:
+      VolumeId: vol-xxxxxxxxxxxxxx
+      DeletionPolicy: Retain
+  - MountDir: xxxxxxxxxxxxxx
+    Name: xxxxxxxxxxxxxx
+    StorageType: Ebs
+    EbsSettings:
+      VolumeId: vol-xxxxxxxxxxxxxx
+      DeletionPolicy: Retain

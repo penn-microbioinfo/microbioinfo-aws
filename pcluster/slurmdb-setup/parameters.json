@@ -1,0 +1,42 @@
+[
+            {
+              "ParameterKey": "AdminPasswordSecretString",
+              "ParameterValue": "",
+              "UsePreviousValue": true
+            },
+            {
+              "ParameterKey": "ClusterAdmin",
+              "ParameterValue": "",
+              "UsePreviousValue": true
+            },
+            {
+              "ParameterKey": "ClusterName",
+              "ParameterValue": "",
+              "UsePreviousValue": true
+            },
+            {
+              "ParameterKey": "MaxCapacity",
+              "ParameterValue": "4",
+              "UsePreviousValue": true
+            },
+            {
+              "ParameterKey": "MaxCapacity",
+              "ParameterValue": "1",
+              "UsePreviousValue": true
+            },
+            {
+              "ParameterKey": "DatabaseClusterSubnetOne",
+              "ParameterValue": "subnet-xxxxxxxxxxxx",
+              "UsePreviousValue": true
+            },
+            {
+              "ParameterKey": "DatabaseClusterSubnetTwo",
+              "ParameterValue": "subnet-xxxxxxxxxxxx",
+              "UsePreviousValue": true
+            },
+            {
+              "ParameterKey": "Vpc",
+              "ParameterValue": "vpc-xxxxxxxxxxxx",
+              "UsePreviousValue": true
+            }
+          ]
