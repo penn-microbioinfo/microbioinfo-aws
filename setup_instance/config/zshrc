@@ -1,7 +1,7 @@
 WHEREAMI=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 
-LS_COLORS='no=00;37:fi=00:di=00;33:ln=04;36:pi=40;33:so=01;35:bd=40;33;01:*.pdf=00;95'
-export LS_COLORS
+#LS_COLORS='no=00;37:fi=00:di=00;33:ln=04;36:pi=40;33:so=01;35:bd=40;33;01:*.pdf=00;95'
+#export LS_COLORS
 zstyle ':completion:*' list-colors ${(s.:.)LS_COLORS}
 
 # The following lines were added by compinstall
@@ -17,7 +17,9 @@ autoload -Uz compinit
 compinit
 # End of lines added by compinstall
 
-. $WHEREAMI/.zshrc_local
+if [ -f $WHEREAMI/.zshrc_local ]; then
+    . $WHEREAMI/.zshrc_local
+fi
 
 # History things
 setopt INC_APPEND_HISTORY
@@ -30,9 +32,9 @@ export HISTSIZE=1000000000
 export SAVEHIST=1000000000
 export R_LIBS_USER="/home/ubuntu/R/x86_64-pc-linux-gnu-library/4.1/"
 
-icat () {
-    kitty +kitten icat $1
-}
+#icat () {
+#    kitty +kitten icat $1
+#}
 pyenv () {
     source ~/pyenvs/$1/bin/activate
 }
@@ -60,7 +62,9 @@ awsmnt() {
 
 # Useful tools
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
-eval "$(zoxide init zsh)"
+if [ $(which zoxide) ]; then
+    eval "$(zoxide init zsh)"
+fi
 
 # Node
 export NVM_DIR="$HOME/.nvm"
