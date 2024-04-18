@@ -31,5 +31,5 @@ cd $PREFIX/pkgs
 wget https://github.com/neovim/neovim/releases/download/stable/nvim-linux64.tar.gz
 tar xvf  nvim-linux64.tar.gz
 chmod u+x $PREFIX/pkgs/nvim-linux64/bin/nvim
-ln -sf $PREFIX/pkgs/nvim-linux64/bin/nvim $HOME/.local/bin/vim
-ln -sf $PREFIX/microbioinfo-aws/submodules/neovim-config/nvim $PREFIX/.config/.
+ln -sf $PREFIX/pkgs/nvim-linux64/bin/nvim $HOME/.local/bin/nvim
+ln -sf $PREFIX/microbioinfo-aws/submodules/neovim-config $PREFIX/.config/nvim
