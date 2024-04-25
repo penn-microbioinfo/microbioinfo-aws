@@ -20,6 +20,8 @@ compinit
 if [ -f $WHEREAMI/.zshrc_local ]; then
     . $WHEREAMI/.zshrc_local
 fi
+export EDITOR=vim
+export PATH=/home/ubuntu/bin:$PATH
 
 # History things
 setopt INC_APPEND_HISTORY
@@ -32,9 +34,15 @@ export HISTSIZE=1000000000
 export SAVEHIST=1000000000
 export R_LIBS_USER="/home/ubuntu/R/x86_64-pc-linux-gnu-library/4.1/"
 
-#icat () {
-#    kitty +kitten icat $1
-#}
+if [[ "$TERM" == "kitty" ]]; then
+    icat () {
+        kitty +kitten icat $1
+    }
+fi
+if [[ "$TERM" == "alacritty" ]]; then
+    export TERM="xterm-256color"
+fi
+
 pyenv () {
     source ~/pyenvs/$1/bin/activate
 }
