@@ -4,12 +4,20 @@ if [ -z $PREFIX ]; then
 	PREFIX=$HOME
 fi
 
+if [ ! -d $PREFIX ]; then
+	mkdir -p $PREFIX
+fi
+
 if [ ! -d $PREFIX/pkgs ]; then
 	mkdir $PREFIX/pkgs
 fi
 
 if [ ! -d $PREFIX/.config ]; then
     mkdir $PREFIX/.config
+fi
+
+if [ ! -d $PREFIX/bin ]; then
+    mkdir $PREFIX/bin
 fi
 
 # Install node.js if needed
@@ -28,8 +36,8 @@ esac
 
 # Setup neovim
 cd $PREFIX/pkgs
-wget https://github.com/neovim/neovim/releases/download/stable/nvim-linux64.tar.gz
+wget https://github.com/neovim/neovim/releases/download/nightly/nvim-linux64.tar.gz
 tar xvf  nvim-linux64.tar.gz
 chmod u+x $PREFIX/pkgs/nvim-linux64/bin/nvim
-ln -sf $PREFIX/pkgs/nvim-linux64/bin/nvim $HOME/.local/bin/nvim
-ln -sf $PREFIX/microbioinfo-aws/submodules/neovim-config $PREFIX/.config/nvim
+ln -sf $PREFIX/pkgs/nvim-linux64/bin/nvim $PREFIX/bin/nvim
+git clone https://www.github.com/amsesk/neovim-config.git $PREFIX/.config/nvim
