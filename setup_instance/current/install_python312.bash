@@ -1,5 +1,11 @@
 #!/bin/bash
 
+# If we are using Ubuntu 20.04 (focal), make sure that some ubuntu packages are installed
+if [ "$(lsb_release -r | cut -f2)" == "20.04" ]; then 
+	sudo apt update
+	sudo apt install zlib1g-dev libssl-dev libffi-dev
+fi
+
 if [ -z $PREFIX ]; then
     PREFIX=$HOME
 fi
